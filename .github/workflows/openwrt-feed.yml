@@ -28,7 +28,14 @@ jobs:
           
           echo "正在下载仓库: $repo_url"
           git clone --depth=1 "$repo_url" "$tmp_dir"
-          rm -rf "$repo_name"
+          
+          if [ -d "$tmp_dir" ] && [ "$(ls -A $tmp_dir)" ]; then
+            rm -rf "$repo_name"
+          else
+            echo "错误: 仓库 $repo_url 下载失败！"
+            rm -rf "$tmp_dir"
+            return 1
+          end
           
           if [ -f "$tmp_dir/Makefile" ]; then
             mkdir -p "$repo_name"
@@ -38,8 +45,13 @@ jobs:
               local pkg_dir=$(dirname "$makefile")
               local pkg_name=$(basename "$pkg_dir")
               if [ "$pkg_dir" != "$tmp_dir" ]; then
-                mkdir -p "$repo_name/$pkg_name"
-                cp -r "$pkg_dir"/. "$repo_name/$pkg_name/"
+                if [ "$pkg_name" = "$repo_name" ]; then
+                  mkdir -p "$repo_name"
+                  cp -r "$pkg_dir"/. "$repo_name/"
+                else
+                  mkdir -p "$repo_name/$pkg_name"
+                  cp -r "$pkg_dir"/. "$repo_name/$pkg_name/"
+                fi
               fi
             done
           fi
