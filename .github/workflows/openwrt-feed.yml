@@ -52,6 +52,7 @@ jobs:
         
         # 2. sirpdboy 的定时任务与家长控制
         copy_feed "https://github.com/sirpdboy/luci-app-taskplan.git"
+        
         copy_feed "https://github.com/sirpdboy/luci-app-parentcontrol.git"
         
         # 3. AirConnect 无线音频桥接
