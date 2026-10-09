@@ -72,7 +72,7 @@ jobs:
         copy_feed "https://github.com/sirpdboy/netspeedtest.git" "main"
         
         # 5. 网络唤醒加强版
-        copy_feed "https://github.com/isalikai/luci-app-owq-wol.git" "master"
+        copy_feed "https://github.com/isalikai/luci-app-owq-wol.git" "main"
         
         # ====================================================================
 
