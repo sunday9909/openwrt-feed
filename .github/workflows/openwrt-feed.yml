@@ -29,13 +29,14 @@ jobs:
           echo "正在下载仓库: $repo_url"
           git clone --depth=1 "$repo_url" "$tmp_dir"
           
+          # 修正：这里之前错写成了 end，现已改为正确的 fi
           if [ -d "$tmp_dir" ] && [ "$(ls -A $tmp_dir)" ]; then
             rm -rf "$repo_name"
           else
             echo "错误: 仓库 $repo_url 下载失败！"
             rm -rf "$tmp_dir"
             return 1
-          end
+          fi
           
           if [ -f "$tmp_dir/Makefile" ]; then
             mkdir -p "$repo_name"
@@ -58,6 +59,7 @@ jobs:
           find "$repo_name" -name ".git" -exec rm -rf {} + 2>/dev/null || true
           rm -rf "$tmp_dir"
         }
+        
         
         # 1. Nikki 核心与插件（多包集成仓库，已支持深度扫描）
         copy_feed "https://github.com/nikkinikki-org/OpenWrt-nikki.git"
