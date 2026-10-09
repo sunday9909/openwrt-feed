@@ -1,4 +1,4 @@
-name: Sync and Merge Multiple Feeds
+name: openwrt-package-feed
 
 on:
   schedule:
