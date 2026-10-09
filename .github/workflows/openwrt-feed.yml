@@ -1,4 +1,4 @@
-name: openwrt-package-feed
+name: Sync and Merge Multiple Feeds
 
 on:
   schedule:
@@ -17,45 +17,42 @@ jobs:
     - name: Set up Git Configuration
       run: |
         git config --global user.name "github-actions[bot]"
-        git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+        git config --global user.email "41898282+github-actions[bot]@://github.com"
 
     - name: Clear and Recreate Target Directory
       run: |
-        # 每次清空旧目录，防止上游已经删除的软件在你的仓库残留
-        rm -rf feeds/
-        mkdir -p feeds/
+        # 💡 已修改：每次清空旧的 app 目录，防止残留
+        rm -rf app/
+        mkdir -p app/
 
     - name: Copy and Merge Repositories
       run: |
-        # 核心物理复制函数
+        # 核心物理复制函数（自动识别默认分支）
         copy_feed() {
           local repo_url=$1
-          local branch=${2:-""}
           local tmp_dir=$(mktemp -d)
           
-          echo "正在下载仓库: $repo_url"
-          if [ -n "$branch" ]; then
-            git clone -b "$branch" --depth=1 "$repo_url" "$tmp_dir"
-          else
-            git clone --depth=1 "$repo_url" "$tmp_dir"
-          fi
+          echo "正在下载仓库（自动识别默认分支）: $repo_url"
+          git clone --depth=1 "$repo_url" "$tmp_dir"
           
-          # 扫描所有 Makefile 并提取软件包（支持嵌套多层的 Feed 仓库）
+          # 扫描所有 Makefile 并提取软件包
           find "$tmp_dir" -maxdepth 4 -name "Makefile" | while read -r makefile; do
             local pkg_dir=$(dirname "$makefile")
             local pkg_name=$(basename "$pkg_dir")
             
             if [ "$pkg_name" != "$(basename "$tmp_dir")" ]; then
               echo "  -> 正在复制软件包: $pkg_name"
-              cp -r "$pkg_dir" "feeds/"
+              # 💡 已修改：将软件包复制到新创建的 app 目录下
+              cp -r "$pkg_dir" "app/"
               # 强行删除可能存在的嵌套 .git 文件夹，防止识别为损坏的子模块
-              rm -rf "feeds/$pkg_name/.git"
+              rm -rf "app/$pkg_name/.git"
             fi
           done
           rm -rf "$tmp_dir"
         }
 
-        # ==================== 【您指定的 6 个同步仓库列表】 ====================
+        # ==================== 【无需指定分支！仅保留仓库链接】 ====================
+        
         # 格式：copy_feed "GitHub仓库链接" "分支名(选填，留空则克隆默认分支)"
         
         # 1. Nikki 核心与插件（多包集成仓库，已支持深度扫描）
@@ -82,10 +79,11 @@ jobs:
 
     - name: Commit and Push Changes
       run: |
-        git add feeds/
+        # 💡 已修改：提交变更到 app 目录
+        git add app/
         if git diff --staged --quiet; then
           echo "没有任何代码变更，跳过提交。"
         else
-          git commit -m "自动物理同步：$(date -u +'%Y-%m-%d %H:%M:%S') UTC"
+          git commit -m "自动物理同步(app)：$(date -u +'%Y-%m-%d %H:%M:%S') UTC"
           git push origin main
         fi
