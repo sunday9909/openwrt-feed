@@ -62,14 +62,14 @@ jobs:
         copy_feed "https://github.com/nikkinikki-org/OpenWrt-nikki.git" "main"
         
         # 2. sirpdboy 的定时任务与家长控制
-        copy_feed "https://github.com/sirpdboy/luci-app-taskplan" "main"
+        copy_feed "https://github.com/sirpdboy/luci-app-taskplan.git" "main"
         copy_feed "https://github.com/sirpdboy/luci-app-parentcontrol.git" "main"
         
         # 3. AirConnect 无线音频桥接
         copy_feed "https://github.com/sbwml/luci-app-airconnect.git" "main"
         
         # 4. sirpdboy 的网络测速
-        copy_feed "https://github.com/sirpdboy/luci-app-netspeedtest" "main"
+        copy_feed "https://github.com/sirpdboy/luci-app-netspeedtest.git" "main"
         
         # 5. 网络唤醒加强版
         copy_feed "https://github.com/isalikai/luci-app-owq-wol.git" "master"
