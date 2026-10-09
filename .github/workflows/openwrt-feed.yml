@@ -69,7 +69,7 @@ jobs:
         copy_feed "https://github.com/sbwml/luci-app-airconnect.git" "main"
         
         # 4. sirpdboy 的网络测速
-        copy_feed "https://github.com/sirpdboy/luci-app-netspeedtest.git" "main"
+        copy_feed "https://github.com/sirpdboy/netspeedtest.git" "main"
         
         # 5. 网络唤醒加强版
         copy_feed "https://github.com/isalikai/luci-app-owq-wol.git" "master"
