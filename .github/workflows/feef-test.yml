@@ -70,7 +70,9 @@ jobs:
         copy_feed "https://github.com/sirpdboy/netspeedtest.git"
         copy_feed "https://github.com/sirpdboy/luci-app-taskplan.git"
         copy_feed "https://github.com/sbwml/luci-app-airconnect.git"
+        copy_feed "https://github.com/qosmio/nss-packages.git"
         copy_feed "https://github.com/davinyue/luci-theme-edge.git"
+        
 
     - name: Commit and Push Changes
       run: |
