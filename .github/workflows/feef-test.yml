@@ -1,0 +1,83 @@
+name: Sync-openwrt-package-test
+
+on:
+  schedule:
+    - cron: '0 20 * * *'
+  workflow_dispatch:
+
+jobs:
+  merge-repos:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout My Repository
+      uses: actions/checkout@v4
+      with:
+        token: ${{ secrets.PAT_TOKEN }}
+
+    - name: Set up Git Configuration
+      run: |
+        git config --global user.name "github-actions[bot]"
+        git config --global user.email "41898282+github-actions[bot]@://github.com"
+
+    - name: Copy and Merge Repositories
+      run: |
+        copy_feed() {
+          local repo_url=$1
+          local repo_name=$(basename "$repo_url" .git)
+          local tmp_dir=$(mktemp -d)
+          
+          echo "正在下载仓库: $repo_url"
+          if ! git clone --depth=1 "$repo_url" "$tmp_dir"; then
+            echo "错误: 仓库 $repo_url 克隆失败！"
+            rm -rf "$tmp_dir"
+            return 1
+          fi
+          
+          if [ -d "$tmp_dir" ] && [ "$(ls -A $tmp_dir)" ]; then
+            rm -rf "$repo_name"
+          else
+            echo "错误: 仓库 $repo_url 下载为空！"
+            rm -rf "$tmp_dir"
+            return 1
+          fi
+          
+          if [ -f "$tmp_dir/Makefile" ]; then
+            mkdir -p "$repo_name"
+            cp -r "$tmp_dir"/. "$repo_name/"
+          else
+            mkdir -p "$repo_name"
+            find "$tmp_dir" -maxdepth 4 -name "Makefile" | while read -r makefile; do
+              local pkg_dir=$(dirname "$makefile")
+              local pkg_name=$(basename "$pkg_dir")
+              
+              if [ "$pkg_dir" != "$tmp_dir" ]; then
+                if [ "$pkg_name" = "$repo_name" ]; then
+                  cp -r "$pkg_dir"/. "$repo_name/"
+                else
+                  mkdir -p "$repo_name/$pkg_name"
+                  cp -r "$pkg_dir"/. "$repo_name/$pkg_name/"
+                fi
+              fi
+            done
+          fi
+          
+          find "$repo_name" -name ".git" -exec rm -rf {} + 2>/dev/null || true
+          rm -rf "$tmp_dir"
+        }
+        
+        copy_feed "https://github.com/FUjr/QModem.git"
+        copy_feed "https://github.com/nikkinikki-org/OpenWrt-nikki.git"
+        copy_feed "https://github.com/sirpdboy/netspeedtest.git"
+        copy_feed "https://github.com/sirpdboy/luci-app-taskplan.git"
+        copy_feed "https://github.com/sbwml/luci-app-airconnect.git"
+        copy_feed "https://github.com/davinyue/luci-theme-edge.git"
+
+    - name: Commit and Push Changes
+      run: |
+        git add .
+        if git diff --staged --quiet; then
+          echo "没有检测到代码更新，跳过提交。"
+        else
+          git commit -m "update: 自动同步 OpenWrt 软件包 (保持原目录结构)"
+          git push origin HEAD
+        fi
