@@ -78,7 +78,6 @@ jobs:
         # 5. 网络唤醒加强版
         copy_feed "https://github.com/isalikai/luci-app-owq-wol.git"
 
-        copy_feed "https://github.com/FUjr/QModem.git"
 
         copy_feed "https://github.com/qosmio/nss-packages.git"
 
